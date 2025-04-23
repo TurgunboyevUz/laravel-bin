@@ -1,5 +1,4 @@
 ---
-
 ```markdown
 # ⚙️ Laravel Project Installer Scripts
 
@@ -86,9 +85,8 @@ When using the `--force` flag:
 
 ## 🧑‍💻 Author
 
-Made by [Your Name]  
-📍 From Uzbekistan 🇺🇿  
-Backend Developer | Laravel & PHP
+Made by Diyorbek Turg'unboyev \
+Backend Developer | PHP, Laravel
 
 ---
 
