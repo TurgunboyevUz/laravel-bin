@@ -1,5 +1,3 @@
-Absolutely! Here's a `README.md` tailored for your Laravel setup scripts that are stored in `~/.config/bin` and pushed to GitHub:
-
 ---
 
 ```markdown
@@ -9,7 +7,7 @@ This repository contains Bash scripts to help you quickly scaffold Laravel proje
 
 📁 Scripts are designed to be stored in: `~/.config/bin`  
 🖥️ Make sure this directory is in your `$PATH` for easy access.
-
+```
 ---
 
 ## 📦 Installation
@@ -97,8 +95,3 @@ Backend Developer | Laravel & PHP
 ## 🪪 License
 
 MIT
-```
-
----
-
-Let me know if you'd like to add examples for the installed structure or if you want to include screenshots for better visualization.
