@@ -1,4 +1,3 @@
----
 ```markdown
 # ⚙️ Laravel Project Installer Scripts
 
