@@ -11,7 +11,7 @@ This repository contains Bash scripts to help you quickly scaffold Laravel proje
 1. **Clone the repository into `~/.config/bin`:**
 
    ```bash
-   git clone https://github.com/your-username/your-repo.git ~/.config/bin
+   git clone https://github.com/TurgunboyevUz/laravel-bin.git ~/.config/bin
    ```
 
 2. **Make sure the scripts are executable:**
