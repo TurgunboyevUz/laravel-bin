@@ -1,11 +1,9 @@
-```markdown
 # ⚙️ Laravel Project Installer Scripts
 
 This repository contains Bash scripts to help you quickly scaffold Laravel projects with optional support for [FilamentPHP](https://filamentphp.com/) and [Nutgram](https://github.com/nutgram/nutgram-laravel).  
 
 📁 Scripts are designed to be stored in: `~/.config/bin`  
 🖥️ Make sure this directory is in your `$PATH` for easy access.
-```
 ---
 
 ## 📦 Installation
