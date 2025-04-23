@@ -1,0 +1,27 @@
+#!/bin/bash
+
+function filament() {
+    composer require filament/filament
+
+    mkdir -p filament
+
+    if ! grep -q '"Filament\\": "filament/"' composer.json; then
+        jq '.autoload."psr-4" += {"Filament\\": "filament/"}' composer.json > composer.tmp && mv -f composer.tmp composer.json
+    fi
+
+    composer dump-autoload
+
+    php artisan filament:install --panels --no-interaction
+
+    ADMIN_PANEL_FILE="app/Providers/Filament/AdminPanelProvider.php"
+
+    if [ -f "$ADMIN_PANEL_FILE" ]; then
+        sed -i "s|app_path('Filament/|base_path('filament/|g" "$ADMIN_PANEL_FILE"
+        sed -i "s|App\\\\Filament|Filament|g" "$ADMIN_PANEL_FILE"
+        echo "🔧 Replaced app_path('Filament/ with base_path('filament/ in $ADMIN_PANEL_FILE"
+    else
+        echo "⚠️ File $ADMIN_PANEL_FILE not found. Skipping replacement."
+    fi
+
+    echo "✅ Filament installed and namespace Filament added."
+}

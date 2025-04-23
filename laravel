@@ -1,0 +1,111 @@
+#!/bin/bash
+
+# Load dependencies
+source ./filament
+source ./nutgram
+
+# ---------[ Args & Flags ]---------
+APP_NAME=$1
+DB_TYPE="mysql"
+RUN_MIGRATE=false
+RUN_FILAMENT=false
+RUN_NUTGRAM=false
+RUN_FORCE=false
+
+for arg in "$@"
+do
+    case $arg in
+        --sqlite) DB_TYPE="sqlite" ;;
+        --migrate) RUN_MIGRATE=true ;;
+        --filament) RUN_FILAMENT=true ;;
+        --nutgram) RUN_NUTGRAM=true ;;
+        --force) RUN_FORCE=true ;;
+    esac
+done
+
+# ---------[ Safety Check ]---------
+if [ -z "$APP_NAME" ]; then
+    echo "❌ Usage: ./laravel.sh {app_name} [--sqlite] [--migrate] [--filament] [--nutgram]"
+    exit 1
+fi
+
+if [ -d "$APP_NAME" ]; then
+    if [ "$RUN_FORCE" = true ]; then
+        echo "⚠️  Project '$APP_NAME' already exists. This will delete it permanently."
+        read -p "❓ Are you sure you want to proceed? (Y/n): " confirm
+        confirm=${confirm,,} # Convert to lowercase
+
+        if [[ -z "$confirm" || "$confirm" == "y" ]]; then
+            echo "🗑️ Removing existing directory '$APP_NAME'..."
+            rm -rf "$APP_NAME"
+        else
+            echo "❌ Deletion cancelled."
+            exit 1
+        fi
+    else
+        echo "❌ Project '$APP_NAME' already exists. Use --force to overwrite it."
+        exit 1
+    fi
+fi
+
+for cmd in composer php jq; do
+    if ! command -v $cmd &> /dev/null; then
+        echo "❌ '$cmd' is not installed. Please install it first."
+        exit 1
+    fi
+done
+
+# ---------[ Install Laravel ]---------
+echo "🚀 Creating Laravel project: $APP_NAME"
+composer create-project laravel/laravel "$APP_NAME"
+cd "$APP_NAME" || exit 1
+
+# ---------[ Set up .env ]---------
+if [ "$DB_TYPE" = "mysql" ]; then
+    echo "⚙️  Configuring MySQL in .env"
+
+    DB_NAME=$(echo "$APP_NAME" | tr '[:upper:]' '[:lower:]' | tr -cd 'a-z0-9_')
+
+    sed -i -E "s|^#?\s*DB_CONNECTION=.*|DB_CONNECTION=mysql|" .env
+    sed -i -E "s|^#?\s*DB_HOST=.*|DB_HOST=127.0.0.1|" .env
+    sed -i -E "s|^#?\s*DB_PORT=.*|DB_PORT=3306|" .env
+    sed -i -E "s|^#?\s*DB_DATABASE=.*|DB_DATABASE=${DB_NAME}|" .env
+    sed -i -E "s|^#?\s*DB_USERNAME=.*|DB_USERNAME=root|" .env
+    sed -i -E "s|^#?\s*DB_PASSWORD=.*|DB_PASSWORD=codearch|" .env
+else
+    echo "🧱 Using SQLite..."
+
+    touch database/database.sqlite
+    sed -i -E "s|^#?\s*DB_CONNECTION=.*|DB_CONNECTION=sqlite|" .env
+    sed -i -E "s|^#?\s*DB_DATABASE=.*|DB_DATABASE=$(realpath database/database.sqlite)|" .env
+    echo "✅ SQLite DB configured and file created."
+fi
+
+# ---------[ Optional Commands ]---------
+if [ "$RUN_FILAMENT" = true ]; then
+    if ! grep -q "filament/filament" composer.json; then
+        echo "🎨 Installing FilamentPHP..."
+        filament &
+    else
+        echo "🎨 Filament is already installed."
+    fi
+fi
+
+if [ "$RUN_NUTGRAM" = true ]; then
+    if ! grep -q "nutgram/laravel" composer.json; then
+        echo "🤖 Installing Nutgram..."
+        nutgram &
+    else
+        echo "🎨 Filament is already installed."
+    fi
+fi
+
+if [ "$RUN_MIGRATE" = true ]; then
+    echo "📦 Running migrations..."
+    php artisan migrate &
+fi
+
+# Wait for all background jobs to finish
+wait
+
+echo "✅ Laravel project '$APP_NAME' ready!"

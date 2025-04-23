@@ -1,0 +1,28 @@
+#!/bin/bash
+
+function nutgram() {
+    composer require nutgram/laravel
+
+    mkdir -p bot/Handler bot/Chat bot/Key bot/Middleware
+
+    touch bot/Handler/MainHandler.php
+    touch bot/Key/Keyboard.php
+    touch bot/Middleware/UserMiddleware.php
+
+    if ! grep -q '"Bot\\": "bot/"' composer.json; then
+        jq '.autoload."psr-4" += {"Bot\\": "bot/"}' composer.json > composer.tmp && mv -f composer.tmp composer.json
+    fi
+
+    composer dump-autoload
+
+    php artisan vendor:publish --provider="Nutgram\Laravel\NutgramServiceProvider" --tag="nutgram"
+
+    if ! grep -q '^TELEGRAM_TOKEN=' .env; then
+        echo -e "\nTELEGRAM_TOKEN=\"*\"" >> .env
+        echo "✅ Added TELEGRAM_TOKEN to .env"
+    else
+        echo "ℹ️ TELEGRAM_TOKEN already exists in .env"
+    fi
+
+    echo "✅ Nutgram installed and namespace Bot added."
+}
