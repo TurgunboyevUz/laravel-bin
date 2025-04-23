@@ -17,7 +17,7 @@ function filament() {
 
     if [ -f "$ADMIN_PANEL_FILE" ]; then
         sed -i "s|app_path('Filament/|base_path('filament/|g" "$ADMIN_PANEL_FILE"
-        sed -i "s|App\\\\Filament|Filament|g" "$ADMIN_PANEL_FILE"
+        sed -i "s|App\\\\\\\\Filament|Filament|g" "$ADMIN_PANEL_FILE"
         echo "🔧 Replaced app_path('Filament/ with base_path('filament/ in $ADMIN_PANEL_FILE"
     else
         echo "⚠️ File $ADMIN_PANEL_FILE not found. Skipping replacement."
